@@ -1,0 +1,225 @@
+{% extends "Framework.html" %} {% block content %}
+<body onload="onload()" />
+<div class="content text-white">
+  <div class="title">
+    <div class="d-flex justify-content-between mb-3">
+      <h1 class="subtitle">
+        Overview
+
+        <button
+          type="button"
+          class="btn"
+          data-bs-toggle="dropdown"
+          aria-expanded="false"
+        >
+          <i class="fa-solid fa-plus"></i>
+        </button>
+        <div class="dropdown-menu">
+          <div class="m-2 queueButton">
+            <form class="info" autocomplete="off" method="POST">
+              <div class="mb-3">
+                <input
+                  class="form-control"
+                  type="text"
+                  placeholder="ID"
+                  aria-label="ID"
+                  id="addid"
+                  name="addid"
+                />
+                <div class="form-text mx-2">Leave empty to generate ID</div>
+              </div>
+              <div class="mb-3">
+                <input
+                  class="form-control"
+                  type="text"
+                  placeholder="Name"
+                  aria-label="Name"
+                  id="name"
+                  name="name"
+                />
+              </div>
+              <div class="mb-3">
+                <select class="form-select" id="location" name="location">
+                  <option selected>Home-Assistant Schrank</option>
+                  <option >Pentest Schrank</option>
+                  <option >Spaß Schrank</option>
+                  <option >Pentest Tisch</option>
+                </select>
+              </div>
+              <div class="left mb-3 form-check">
+                <input
+                  type="checkbox"
+                  class="form-check-input"
+                  id="checkbox"
+                  name="checkbox"
+                  style="float: left"
+                />
+                <label class="form-check-label">Print QR-Code</label>
+              </div>
+              <button
+                type="submit"
+                class="btn btn-outline-success right"
+                style="float: right"
+              >
+                Add
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          class="btn"
+          data-bs-toggle="dropdown"
+          aria-expanded="false"
+        >
+          <i class="fa-solid fa-minus"></i>
+        </button>
+
+        <div class="dropdown-menu" style="text-align: left">
+          <div class="m-2 queueButton">
+            <form class="info" method="POST">
+              <div class="mb-3">
+                <input
+                  class="form-control"
+                  type="text"
+                  placeholder="ID"
+                  aria-label="ID"
+                  id="del"
+                  name="del"
+                />
+              </div>
+
+              <button
+                type="submit"
+                class="btn btn-outline-danger right"
+                style="float: right"
+              >
+                Delete
+              </button>
+            </form>
+          </div>
+        </div>
+      </h1>
+
+      <div class="m-2 queueButton">
+        <form class="d-flex">
+          <input
+            class="form-control mx-2 w-75"
+            type="text"
+            placeholder="Search"
+            aria-label="Search"
+            id="item"
+            name="item"
+          />
+          <button class="btn btn-outline-success" id="btn">
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </button>
+        </form>
+      </div>
+    </div>
+    <div class="box container p-1">
+      <span id="filter-count"> Items found:</span>
+    </div>
+    {% if invdata|length > 0 %}{% with data=["ItemID", "Name", "Available",
+    "BorrowedBy","Storagelocation"] %} {% include "TaskBox.html" %} {% endwith
+    %} {% endif %}
+    <div class="accordion" style="width: 100%; height: 40rem; overflow: auto">
+      {%for key in invdata.keys() %}{%with data =
+      [key,invdata[key][0],invdata[key][2],invdata[key][3],invdata[key][1]]%}{%include
+      "ModifiedTaskBox.html"%}{%endwith%} {% endfor %} {%if invdata == {}%}[ i ]
+      No Items found for search . . .{%endif%}
+    </div>
+  </div>
+</div>
+
+<span id="statusBox">Idle...</span>
+
+<button class="btn btn-outline-red ms-5 mt-4" onclick="print_queue()">
+  Print queue of recent added Items
+</button>
+
+<script>
+  function print_queue() {
+    panel = document.getElementById("statusBox");
+    panel.innerHTML =
+      '<div id="statusBox" class="alert alert-info" role="alert"><i class="fas fa-hourglass-half"></i><span>Processing print request...</span></div>';
+    $.ajax({
+      type: "GET",
+      url: "/queue",
+      success: function (codes) {
+        console.log(codes);
+        for (let i = 0; i < codes.length; i++) {
+          let text =
+            "text=" +
+            codes[i] +
+            "&font_family=Arial&font_style=Regular&font_size=45&label_size=d24&align=center&orientation=standard&margin_top=53&margin_bottom=35&margin_left=30&margin_right=35&print_type=qrcode&qrcode_size=9&qrcode_correction=L&print_count=1&image_bw_threshold=70&image_mode=black_and_white&line_spacing=118&shrink_or_wrap=wrap&cut_mode=cut";
+          $.post("http://localhost:8013/labeldesigner/api/print", text);
+        }
+        panel.innerHTML = "";
+      },
+      error: function () {
+        panel.innerHTML = "An error occured";
+      },
+    });
+  }
+
+  function print(qr_id) {
+    panel = document.getElementById("statusBox");
+    panel.innerHTML =
+      '<div id="statusBox" class="alert alert-info" role="alert"><i class="fas fa-hourglass-half"></i><span>Processing print request...</span></div>';
+    let text =
+      "text=" +
+      qr_id +
+      "&font_family=Arial&font_style=Regular&font_size=45&label_size=d24&align=center&orientation=standard&margin_top=53&margin_bottom=35&margin_left=30&margin_right=35&print_type=qrcode&qrcode_size=9&qrcode_correction=L&print_count=1&image_bw_threshold=70&image_mode=black_and_white&line_spacing=118&shrink_or_wrap=wrap&cut_mode=cut";
+    $.post("http://localhost:8013/labeldesigner/api/print", text);
+    panel.innerHTML = "";
+  }
+
+  function options(borrow, ret, del, id) {
+    // Define the data to be sent
+    var func = {
+      borrow: borrow,
+      ret: ret,
+      del: del,
+      id: id,
+    };
+
+    // Send a POST request to Flask with the data
+    $.ajax({
+      type: "POST",
+      url: "/options",
+      data: JSON.stringify(func),
+      contentType: "application/json",
+      success: function () {
+        location.reload();
+      },
+    });
+  }
+
+  function onload() {
+    $.ajax({
+      type: "GET",
+      url: "/options/response",
+      success: function (input) {
+        if (input != "") {
+          alertify.message(input);
+        }
+      },
+    });
+  }
+</script>
+
+<script>
+    {%if message != None%}
+      alertify.message("{{message}}");
+    {%endif%}
+
+    {%if print_qr != None%}
+    let text =
+    "text={{print_qr}}&font_family=Arial&font_style=Regular&font_size=45&label_size=d24&align=center&orientation=standard&margin_top=53&margin_bottom=35&margin_left=30&margin_right=35&print_type=qrcode&qrcode_size=9&qrcode_correction=L&print_count=1&image_bw_threshold=70&image_mode=black_and_white&line_spacing=118&shrink_or_wrap=wrap&cut_mode=cut";
+  $.post("http://localhost:8013/labeldesigner/api/print", text);
+    {%endif%}
+</script>
+<script src="js/spinner.js" />
+{% endblock %}

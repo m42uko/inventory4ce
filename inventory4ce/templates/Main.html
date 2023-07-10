@@ -1,0 +1,161 @@
+{% extends "Framework.html" %} {% block content %}
+
+<script src="js/instascan.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<div class="content text-white">
+  <div class="d-flex align-items-center">
+    <h1 class="title">Scanning Barcode!</h1>
+    <div class="videoselect">
+      <select class="form-select" id="videoSource"></select>
+    </div>
+  </div>
+  <div class="submenu" id="load">
+    <br />
+    <video id="preview" playsinline autoplay style="float: left"></video>
+    <div class="barcodeinfo">
+      <br />
+      <br />
+      <br />
+      <h2 class="subtitle">Recognized Barcode</h2>
+      <br />
+      <h4>ID: <span id="qrcode"></span></h4>
+      <h4>Itemname: <span id="itemname"></span></h4>
+      <h4>Borrowed by: <span id="borrowedname"></span></h4>
+    </div>
+
+    <div class="" style="text-align: center; width: 640px">
+      <div class="my-3" id="message"></div>
+      <div class="my-3" id="box"></div>
+    </div>
+  </div>
+</div>
+<script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
+<script src="/js/webrtc.js" async></script>
+<script src="/js/cookies.js"></script>
+
+<script>
+
+  //var audio = new Audio('mp3/movie_1.mp3');
+  var audio = new Audio('https://www.myinstants.com/media/sounds/road-runner-meep-meep.mp3');
+  var person = "";
+  var content = "";
+  var user_file = {{ userdata|tojson }};
+  var item_file = {{ invdata|tojson }};
+  let name = "{{session['registered_user']}}";
+  borrow = document.getElementById("borrow");
+  ret = document.getElementById("ret");
+  borrowfrom = document.getElementById("borrowfrom");
+  message = document.getElementById("message");
+  box = document.getElementById("box");
+
+  const validKeys = Object.keys(user_file);
+  let buttonContainer = document.getElementById("button-container");
+  let barcode = document.getElementById("qrcode");
+  let barcodename = document.getElementById("itemname");
+  let borrowedname = document.getElementById("borrowedname")
+  let scanner = new Instascan.Scanner({
+    video: document.getElementById("preview"),
+  });
+
+    Instascan.Camera.getCameras()
+    .then((cameras) => {
+    if (cameras.length > 0) {
+      scanner.start(cameras[0]);
+    } else {
+      console.error("No cameras found.");
+    }
+  })
+  .catch((error) => console.error(error));
+
+    scanner.addListener('scan', function (content) {
+      audio.play();
+      barcode.innerText = content;
+      person = name;
+      buttons(content,person);
+    });
+
+  function test1(person,content,method) {
+      // Define the data to be sent
+      var func = {
+        'method': method,
+        'person':person,
+        'barcode' : content
+      };
+
+      // Send a POST request to Flask with the data
+      $.ajax({
+        type: "POST",
+        url: "/functions",
+        data: JSON.stringify(func),
+        contentType: "application/json",
+        success: function(){
+        updateData(content,person);
+
+        }
+      });
+
+      if (method == "borrow"){
+        alertify.message("You borrowed "+content);
+      }
+      else if(method == "borrowfrom"){
+        alertify.message("You stole "+content+" from "+person);
+      }else{
+        alertify.message("You returned "+content);
+      };
+
+  }
+
+  function updateData(content,person){
+
+    $.ajax({
+      type: "GET",
+      url: "/getdata",
+      success: function(input){
+        user_file = input.userdata;
+        buttons(content, person);
+      }
+    });
+
+
+  }
+
+  function buttons(content,person){
+    if (content in item_file){
+        itemname.innerHTML = item_file[content][0];
+      if (user_file[person].includes(content)) {
+        message.innerHTML = 'Do you want to return the Item?';
+        box.innerHTML = '<button class="btn btn-warning" onclick="test1(\''+person+'\',\''+content+'\',\'ret\')">Return</button>';
+
+      } else {
+        let isInOtherKeys = false;
+
+        for (let key in user_file) {
+          if (user_file[key].includes(content)) {
+            person = key;
+            isInOtherKeys = true;
+          }
+        }
+
+        if (isInOtherKeys) {
+          // If so, show a button for the other key
+          message.innerHTML = 'Item already borrowed from '+person;
+          box.innerHTML = '<button class="btn btn-danger" onclick="test1(\''+person+'\',\''+content+'\',\'borrowfrom\')">Steal from '+person+'</button>';
+        } else {
+          // Otherwise, show a button to borrow the item
+          person="";
+          message.innerHTML = 'Do you want to borrow the Item?';
+          box.innerHTML = '<button class="btn btn-success" onclick="test1(\''+person+'\',\''+content+'\',\'borrow\')">Borrow</button>';
+        }
+      }
+      borrowedname.innerText = person;
+
+    } else {
+    message.innerHTML = 'You first have to add the item to the inventory!';
+    box.innerHTML = '<a href="/inventory" class="btn btn-danger">Add item</a>';
+    }
+  }
+</script>
+<script src="js/spinner.js" />
+<!-- Don't delete this script, else it's not working -->
+{% endblock %}

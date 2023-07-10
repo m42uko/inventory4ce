@@ -1,0 +1,113 @@
+body {
+  animation: rainbow-bg 2.5s linear;
+  animation-iteration-count: infinite;
+}
+
+h1 {
+  animation: rainbow-text 2.5s linear;
+  animation-iteration-count: infinite;
+  font-family: opake, sans-serif;
+  font-weight: 900;
+  font-style: normal;
+  text-decoration: wavy;
+}
+
+.card {
+  position: absolute;
+  height: fit-content;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  justify-content: center;
+  z-index: 20;
+  background-color: black;
+  text-align: center;
+  align-self: center;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.fs {
+  font-size: 50px;
+  text-decoration: underline;
+}
+
+@keyframes rainbow-text {
+  100%,
+  0% {
+    color: rgb(0, 255, 255);
+  }
+  8% {
+    color: rgb(0, 127, 255);
+  }
+  16% {
+    color: rgb(0, 0, 255);
+  }
+  25% {
+    color: rgb(127, 0, 255);
+  }
+  33% {
+    color: rgb(255, 0, 255);
+  }
+  41% {
+    color: rgb(255, 0, 127);
+  }
+  50% {
+    color: rgb(255, 0, 0);
+  }
+  58% {
+    color: rgb(255, 127, 0);
+  }
+  66% {
+    color: rgb(255, 255, 0);
+  }
+  75% {
+    color: rgb(127, 255, 0);
+  }
+  83% {
+    color: rgb(0, 255, 0);
+  }
+  91% {
+    color: rgb(0, 255, 127);
+  }
+}
+
+@keyframes rainbow-bg {
+  100%,
+  0% {
+    background-color: rgb(0, 255, 255);
+  }
+  8% {
+    background-color: rgb(0, 127, 255);
+  }
+  16% {
+    background-color: rgb(0, 0, 255);
+  }
+  25% {
+    background-color: rgb(127, 0, 255);
+  }
+  33% {
+    background-color: rgb(255, 0, 255);
+  }
+  41% {
+    background-color: rgb(255, 0, 127);
+  }
+  50% {
+    background-color: rgb(255, 0, 0);
+  }
+  58% {
+    background-color: rgb(255, 127, 0);
+  }
+  66% {
+    background-color: rgb(255, 255, 0);
+  }
+  75% {
+    background-color: rgb(127, 255, 0);
+  }
+  83% {
+    background-color: rgb(0, 255, 0);
+  }
+  91% {
+    background-color: rgb(0, 255, 127);
+  }
+}

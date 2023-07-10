@@ -1,0 +1,134 @@
+{% extends "Framework.html" %} {% block content %}
+<div class="content text-white">
+  <div class="title">
+    <div class="d-flex justify-content-between mb-3">
+      <h1 class="subtitle">
+        User
+
+        <div class="btn-group">
+          <button
+            type="button"
+            class="btn"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+          >
+            <i class="fa-solid fa-user-plus"></i>
+          </button>
+          <div class="dropdown-menu">
+            <div class="m-2 queueButton">
+              <form class="d-flex info" method="POST">
+                <input
+                  class="form-control mx-2 w-200"
+                  type="text"
+                  placeholder="Name"
+                  aria-label="Search"
+                  name="add"
+                />
+                <button
+                  class="btn btn-outline-success"
+                  type="submit"
+                  name="add_submit"
+                >
+                  Add
+                </button>
+              </form>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            class="btn"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+          >
+            <i class="fa-solid fa-user-minus"></i>
+          </button>
+          <div class="dropdown-menu">
+            <div class="m-2 queueButton">
+              <form class="d-flex info" method="POST">
+                <input
+                  class="form-control mx-2 w-200"
+                  type="text"
+                  placeholder="Name"
+                  aria-label="Search"
+                  name="del"
+                />
+                <button
+                  class="btn btn-outline-danger"
+                  type="submit"
+                  name="del_submit"
+                >
+                  Delete
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </h1>
+    </div>
+
+    <div
+      class="accordion accordion-flush py-4 box container"
+      id="accordionFlushExample"
+    >
+      {%for usr in userdata.keys()%}
+
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="flush-heading{{usr}}">
+          <button
+            class="accordion-button collapsed"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#flush-collapse{{usr}}"
+            aria-expanded="false"
+            aria-controls="flush-collapse{{usr}}"
+          >
+            {{usr}}
+          </button>
+        </h2>
+        <div
+          id="flush-collapse{{usr}}"
+          class="accordion-collapse collapse"
+          aria-labelledby="flush-heading{{usr}}"
+          data-bs-parent="#accordionFlushExample"
+        >
+          <div class="accordion-body">
+            {%for i in userdata[usr]%} {%with data = [i,invdata[i][0]]%}
+            {%include"UserBox.html"%}{%endwith%}{%endfor%}
+          </div>
+        </div>
+      </div>
+      {%endfor%}{%if message != None%}
+      <script>
+        alertify.message("{{message}}");
+      </script>
+      {%endif%}
+    </div>
+  </div>
+</div>
+
+<script>
+  function retitem(id) {
+    // Define the data to be sent
+    var func = {
+      borrow: "False",
+      ret: "True",
+      del: "False",
+      id: id,
+    };
+
+    // Send a POST request to Flask with the data
+    $.ajax({
+      type: "POST",
+      url: "/options",
+      data: JSON.stringify(func),
+      contentType: "application/json",
+      success: function () {
+        location.reload();
+      },
+    });
+  }
+</script>
+
+<script src="js/spinner.js" />
+{% endblock %}

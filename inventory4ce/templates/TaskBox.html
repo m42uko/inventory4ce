@@ -1,0 +1,11 @@
+<div
+  class="box container text-white {% if data[0] == 'ItemID'%} bg-blue-head mb-3{% elif data[2] == 'No'%}bg-red{% else %} bg-green {% endif %} rounded-2 mb-1"
+>
+  <div class="row py-3 text-center">
+    {% for info in data %}
+    <div class="col d-flex align-items-center justify-self-center">
+      {{info|safe}}
+    </div>
+    {% endfor %}
+  </div>
+</div>

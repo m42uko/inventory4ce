@@ -1,0 +1,18 @@
+<div class="box container text-white bg-green rounded-2 mb-1">
+  <div class="row py-2 boxrow">
+    {% for info in data %}
+    <div class="col d-flex align-items-center justify-self-center">
+      {{info|safe}}
+    </div>
+    {% endfor %}
+    <div class="col">
+      <button
+        style="float: right"
+        class="btn btn-outline-danger px-4"
+        onclick="retitem('{{data[0]}}')"
+      >
+        Return
+      </button>
+    </div>
+  </div>
+</div>

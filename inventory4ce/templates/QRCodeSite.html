@@ -1,0 +1,43 @@
+{% extends "Framework.html" %} {% block content %}
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script
+  src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.27.2/axios.min.js"
+  integrity="sha512-odNmoc1XJy5x1TMVMdC7EMs3IVdItLPlCeL5vSUPN2llYKMJ2eByTTAIiiuqLg+GdNr9hF6z81p27DArRFKT7A=="
+  crossorigin="anonymous"
+  referrerpolicy="no-referrer"
+></script>
+
+<div class="content text-white">
+  <div class="d-flex align-items-center lh-base">
+    <h1 class="title">Scanning Barcode!</h1>
+  </div>
+  <div class="submenu" id="load">
+    <h2 class="subtitle">Recognized Barcode: "<span id="qrcode"></span>"</h2>
+    <img src="{{url_for('video_feed')}}" />
+
+    {%for key in data.keys() %} {%if key=="1234"%}1234 in Lager {%endif%}
+    {%endfor %}
+
+    <script>
+      function getRandomNumber() {
+        url = "/qrcode/update";
+
+        axios
+          .get(url)
+          .then(function (response) {
+            var test1 = response.data.qrcode;
+            document.getElementById("qrcode").innerHTML = test1;
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
+      }
+
+      //functioninterval
+      var intervalID = window.setInterval(getRandomNumber, 1000);
+    </script>
+
+    {% endblock %}
+  </div>
+</div>
