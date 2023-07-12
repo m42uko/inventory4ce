@@ -184,10 +184,19 @@ def send_user():
 
 
 def run():
+    certfile = os.environ.get('INVENTORY_CERT',None)
+    certkey = os.environ.get('INVENTORY_KEY',None)
+    if certfile and certkey:
+        cert = (certfile,certkey)
+    else:
+        print("starting with ad-hoc certificate, use INVENTORY_CERT and INVENTORY_KEY to define certificate")
+        cert = 'adhoc'
+
+
     app.run(debug=os.environ.get('INVENTORY_DEBUG','').lower() in ['on','true','yes'],
             host=os.environ.get('INVENTORY_HOST','127.0.0.1'),
             port=int(os.environ.get('INVENTORY_PORT',3000)),
-            ssl_context='adhoc'
+            ssl_context=cert
             )
 
 if __name__ == '__main__':
