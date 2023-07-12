@@ -14,7 +14,7 @@ qrcode = "^7.4.2"
 pyopenssl = "^23.2.0"
 
 [tool.poetry.scripts]
-intenvory4ce = "inventory4ce.app:run"
+inventory4ce = "inventory4ce.app:run"
 
 [tool.poetry.dev-dependencies]
 
