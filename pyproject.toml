@@ -2,7 +2,7 @@
 name = "inventory4ce"
 version = "1.0.0"
 description = ""
-authors = [""]
+authors = ["Kalauerclub <aramark@gmx.de>"]
 license = "MIT"
 
 [tool.poetry.dependencies]
