@@ -10,4 +10,5 @@ RUN pip install --trusted-host pypi.org -r requirements.txt
 
 COPY . .
 
+WORKDIR /inventory-4ce/inventory4ce
 CMD [ "python3", "-m" , "flask", "run", "--host=0.0.0.0"]
